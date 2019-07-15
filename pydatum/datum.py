@@ -3,14 +3,24 @@ Datetime utilities similar to Joda Time or Calendar in Java
 See https://pymotw.com/2/datetime/ for more arithmetic.
 """
 import calendar
+import re
 from datetime import date, datetime, time, timedelta
-#from logging import DEBUG, log
+# from logging import DEBUG, log
 
 from dateutil.relativedelta import relativedelta
 
 ISO_DATE_FORMAT = "%Y-%m-%d"
 ISO_LONG_FORMAT = "%Y-%m-%dT%H:%M:%S"
 ISO_FULL_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
+
+PERIODS = {
+    'second': dict(microsecond=0),
+    'minute': dict(microsecond=0, second=0),
+    'hour': dict(microsecond=0, second=0, minute=0),
+    'day': dict(microsecond=0, second=0, minute=0, hour=0, ),
+    'month': dict(microsecond=0, second=0, minute=0, hour=0, day=1),
+    'year': dict(microsecond=0, second=0, minute=0, hour=0, day=1, month=1),
+}
 
 
 class Datum:
@@ -24,9 +34,18 @@ class Datum:
         """ Parse date string. Currently only ISO strings supported yyyy-mm-dd. """
         result = Datum()
 
-        result.from_iso_date_string(value)
+        if value.isdigit():
+            result.from_timestamp_date_string(value)
+        elif isinstance(value, datetime):
+            result.from_datetime(value)
+        else:
+            result.from_iso_date_string(value)
 
         return result
+
+    def truncate(self, truncate_to='day'):
+        self.value = self.value.replace(**PERIODS[truncate_to])
+        return self.value
 
     def add_days(self, days: int) -> datetime:
         """ Adds days """
@@ -36,6 +55,36 @@ class Datum:
     def add_months(self, value: int) -> datetime:
         """ Add a number of months to the given date """
         self.value = self.value + relativedelta(months=value)
+        return self.value
+
+    def add_hours(self, value: int) -> datetime:
+        """ Add a number of months to the given date """
+        self.value = self.value + relativedelta(hour=value)
+        return self.value
+
+    def add_minutes(self, value: int) -> datetime:
+        """ Add a number of months to the given date """
+        self.value = self.value + relativedelta(minutes=value)
+        return self.value
+
+    def substract_days(self, days: int) -> datetime:
+        """ Substract days """
+        self.value = self.value - relativedelta(days=days)
+        return self.value
+
+    def substract_months(self, value: int) -> datetime:
+        """ Substract a number of months to the given date """
+        self.value = self.value - relativedelta(months=value)
+        return self.value
+
+    def substract_hours(self, value: int) -> datetime:
+        """ Substract a number of months to the given date """
+        self.value = self.value - relativedelta(hour=value)
+        return self.value
+
+    def substract_minutes(self, value: int) -> datetime:
+        """ Substract a number of months to the given date """
+        self.value = self.value - relativedelta(minutes=value)
         return self.value
 
     def clone(self):
@@ -56,14 +105,23 @@ class Datum:
 
     @property
     def datetime(self) -> datetime:
-        ''' The datetime value. '''
+        """ The datetime value. """
         return self.value
+
+    @property
+    def epoch(self) -> int:
+        """ The timestamp value. """
+        return int(self.value.strftime('%s'))
+
+    @property
+    def epoch_miliseconds(self) -> int:
+        """ The timestamp value with miliseconds. """
+        return int(self.value.strftime('%s')) * 1000
 
     def from_date(self, value: date) -> datetime:
         """ Initializes from the given date value """
         assert isinstance(value, date)
 
-        #self.value = datetime.combine(value, time.min)
         self.value = datetime(value.year, value.month, value.day)
         return self.value
 
@@ -86,6 +144,13 @@ class Datum:
         assert isinstance(date_str, str)
 
         self.value = datetime.strptime(date_str, ISO_DATE_FORMAT)
+        return self.value
+
+    def from_timestamp_date_string(self, date_str: str) -> datetime:
+        """ Parse timestamp date string (1560718800) """
+        assert isinstance(date_str, str)
+
+        self.value = datetime.fromtimestamp(int(date_str))
         return self.value
 
     def get_day(self) -> int:
@@ -134,6 +199,11 @@ class Datum:
         # subtract one day
         result = result - relativedelta(days=1)
         self.value = result
+        return self.value
+
+    def begin_of_week(self) -> datetime:
+        """ Set the value to beginning of the week """
+        self.value = self.value - timedelta(days=self.value.weekday())
         return self.value
 
     def is_end_of_month(self) -> bool:
@@ -187,12 +257,6 @@ class Datum:
         second = self.time.second
         return f"{hour:02}:{minute:02}:{second:02}"
 
-    # def to_iso_time_string(self) -> str:
-    #     """ Return the iso time string only. i.e. 22:33:44 """
-    #     short_time = self.to_short_time_string()
-    #     second = self.time.second
-    #     return f"{short_time}:{second:02}"
-
     def to_datetime_string(self) -> str:
         """ Returns a human-readable string representation with iso date and time
         Example: 2018-12-06 12:32:56
@@ -209,7 +273,6 @@ class Datum:
         time_display = self.to_short_time_string()
         return f"{date_display} {time_display}"
 
-
     def today(self) -> datetime:
         """ Returns today (date only) as datetime """
         self.value = datetime.combine(datetime.today().date(), time.min)
@@ -222,7 +285,17 @@ class Datum:
 
     def __repr__(self):
         """ string representation """
-        #iso_str = self.to_iso_string()
         datetime_str = self.to_datetime_string()
 
         return f"{datetime_str}"
+
+
+if __name__ == '__main__':
+    a = Datum.parse('1560718800')
+    a.add_months(1)
+    # a.add_days(1)
+    # a.add_hours(1)
+    # a.add_minutes(40)
+    # a.substract_days(1)
+    print('[√]: ', a.epoch)
+    print('[√]: ', a.epoch_miliseconds)
