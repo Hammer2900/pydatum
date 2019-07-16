@@ -43,6 +43,8 @@ class Datum:
 
         return result
 
+    # //////////////////////// Arithmetic ////////////////////////
+
     def truncate(self, truncate_to='day'):
         self.value = self.value.replace(**PERIODS[truncate_to])
         return self.value
@@ -85,6 +87,11 @@ class Datum:
     def substract_minutes(self, value: int) -> datetime:
         """ Substract a number of months to the given date """
         self.value = self.value - relativedelta(minutes=value)
+        return self.value
+
+    def subtract_weeks(self, weeks: int) -> datetime:
+        """ Subtracts number of weeks from the current value """
+        self.value = self.value - timedelta(weeks=weeks)
         return self.value
 
     def clone(self):
@@ -185,9 +192,22 @@ class Datum:
         """ Returns the year """
         return self.value.year
 
+    # /////////////////////////// Slice ///////////////////////////
+
+    def start_of_day(self) -> datetime:
+        """ Returns start of day """
+        self.value = datetime(self.value.year, self.value.month, self.value.day)
+        return self.value
+
     def end_of_day(self) -> datetime:
         """ End of day """
         self.value = datetime(self.value.year, self.value.month, self.value.day, 23, 59, 59)
+        return self.value
+
+    def start_of_month(self):
+        """ Return start month date """
+        self.start_of_day()
+        self.value = self.value.replace(day=1)
         return self.value
 
     def end_of_month(self) -> datetime:
@@ -206,12 +226,23 @@ class Datum:
         self.value = self.value - timedelta(days=self.value.weekday())
         return self.value
 
+    def yesterday(self) -> datetime:
+        """ Set the value to yesterday """
+        self.value = datetime.today() - timedelta(days=1)
+        return self.value
+
+    # ////////////////////////// Checks //////////////////////////
+
     def is_end_of_month(self) -> bool:
         """ Checks if the date is at the end of the month """
         end_of_month = Datum()
         # get_end_of_month(value)
         end_of_month.end_of_month()
         return self.value == end_of_month.value
+
+    def is_weekday(self, date):
+        """ Checks if the date provided as an arguement is a weekday or not """
+        return True if date.weekday() in range(0, 5) else False
 
     def set_day(self, day: int) -> datetime:
         """ Sets the day value """
@@ -223,26 +254,6 @@ class Datum:
         assert isinstance(value, datetime)
 
         self.value = value
-
-    def start_of_day(self) -> datetime:
-        """ Returns start of day """
-        self.value = datetime(self.value.year, self.value.month, self.value.day)
-        return self.value
-
-    def subtract_days(self, days: int) -> datetime:
-        """ Subtracts dates from the given value """
-        self.value = self.value - relativedelta(days=days)
-        return self.value
-
-    def subtract_weeks(self, weeks: int) -> datetime:
-        """ Subtracts number of weeks from the current value """
-        self.value = self.value - timedelta(weeks=weeks)
-        return self.value
-
-    def subtract_months(self, months: int) -> datetime:
-        """ Subtracts a number of months from the current value """
-        self.value = self.value - relativedelta(months=months)
-        return self.value
 
     def to_short_time_string(self) -> str:
         """ Return the iso time string only. i.e. 22:33 """
@@ -278,10 +289,19 @@ class Datum:
         self.value = datetime.combine(datetime.today().date(), time.min)
         return self.value
 
-    def yesterday(self) -> datetime:
-        """ Set the value to yesterday """
-        self.value = datetime.today() - timedelta(days=1)
-        return self.value
+    # ///////////////////////// Iterators /////////////////////////
+
+    def day_range_weekday(self, start, end):
+        """
+        Returns a generator that can be used to iterate over
+        the weekdays in the range start to end-1
+        """
+        if start > end:
+            return
+        while not start == end:
+            if self.is_weekday(start):
+                yield start
+            start += timedelta(days=1)
 
     def __repr__(self):
         """ string representation """
@@ -297,5 +317,5 @@ if __name__ == '__main__':
     # a.add_hours(1)
     # a.add_minutes(40)
     # a.substract_days(1)
-    print('[√]: ', a.epoch)
+    print('[√]: ', a)
     print('[√]: ', a.epoch_miliseconds)
