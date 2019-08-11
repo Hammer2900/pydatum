@@ -9,6 +9,8 @@ from datetime import date, datetime, time, timedelta
 
 from dateutil.relativedelta import relativedelta
 
+__all__ = ("Datum",)
+
 ISO_DATE_FORMAT = "%Y-%m-%d"
 ISO_LONG_FORMAT = "%Y-%m-%dT%H:%M:%S"
 ISO_FULL_FORMAT = "%Y-%m-%dT%H:%M:%S.%fZ"
@@ -25,6 +27,8 @@ PERIODS = {
 
 class Datum:
     """ Encapsulates datetime value and provides operations on top of it """
+
+    __slots__ = ('value',)
 
     def __init__(self):
         self.value: datetime = datetime.now()
@@ -308,14 +312,3 @@ class Datum:
         datetime_str = self.to_datetime_string()
 
         return f"{datetime_str}"
-
-
-if __name__ == '__main__':
-    a = Datum.parse('1560718800')
-    a.add_months(1)
-    # a.add_days(1)
-    # a.add_hours(1)
-    # a.add_minutes(40)
-    # a.substract_days(1)
-    print('[√]: ', a)
-    print('[√]: ', a.epoch_miliseconds)
