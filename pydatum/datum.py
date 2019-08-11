@@ -9,6 +9,8 @@ from datetime import date, datetime, time, timedelta
 
 from dateutil.relativedelta import relativedelta
 
+from pydatum.range import DateRange
+
 __all__ = ("Datum",)
 
 ISO_DATE_FORMAT = "%Y-%m-%d"
@@ -45,6 +47,15 @@ class Datum:
         else:
             result.from_iso_date_string(value)
 
+        return result
+
+    def range(self, end: datetime, start: datetime = None):
+        """ Prepare and fill range object. """
+        start_date = start
+        end_date = end
+        if not start_date:
+            start_date = self.value
+        result = DateRange(start_date, end_date)
         return result
 
     # //////////////////////// Arithmetic ////////////////////////
