@@ -32,7 +32,7 @@ setup(
     # There are some restrictions on what makes a valid project name
     # specification here:
     # https://packaging.python.org/specifications/core-metadata/#name
-    name='pydatum',  # Required
+    name='TimeP',  # Required
 
     # Versions should comply with PEP 440:
     # https://www.python.org/dev/peps/pep-0440/
@@ -40,12 +40,12 @@ setup(
     # For a discussion on single-sourcing the version across setup.py and the
     # project code, see
     # https://packaging.python.org/en/latest/single_source_version.html
-    version='1.1.0',  # Required
+    version='1.0',  # Required
 
     # This is a one-line description or tagline of what your project does. This
     # corresponds to the "Summary" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#summary
-    description='datetime and calendar utilities',  # Required
+    description='datetime, range, timestamp, calendar utilities',  # Required
 
     # This is an optional longer description of your project that represents
     # the body of text which users will see when they visit PyPI.
@@ -61,15 +61,15 @@ setup(
     #
     # This field corresponds to the "Home-Page" metadata field:
     # https://packaging.python.org/specifications/core-metadata/#home-page-optional
-    url='https://github.com/MisterY/pydatum',  # Optional
+    url='https://github.com/Hammer2900/pydatum',  # Optional
 
     # This should be your name or the name of the organization which owns the
     # project.
-    author='Alen Siljak',  # Optional
+    author='Jek T.',  # Optional
 
     # This should be a valid email address corresponding to the author listed
     # above.
-    author_email='alen.siljak@gmx.com',  # Optional
+    author_email='evgeny2900@gmail.com',  # Optional
 
     license='GPL version 3',
 
@@ -82,7 +82,7 @@ setup(
         #   3 - Alpha
         #   4 - Beta
         #   5 - Production/Stable
-        'Development Status :: 3 - Alpha',
+        'Development Status :: 4 - Beta',
 
         # Indicate who your project is intended for
         'Intended Audience :: Developers',
